@@ -32,7 +32,6 @@
 }
 
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html{scroll-behavior:smooth}
 body{
   background:var(--red);
   color:var(--black);
@@ -561,11 +560,27 @@ VENUES.forEach(v => {
   markers[v.n] = {marker:m, el, popup, data:v};
 });
 
+/* smooth scroll that does not rely on CSS scroll-behavior */
+function scrollToY(targetY, ms){
+  const startY = window.pageYOffset || document.documentElement.scrollTop;
+  const dy = targetY - startY;
+  if (Math.abs(dy) < 4) return;
+  const t0 = performance.now();
+  (function step(now){
+    const p = Math.min((now - t0) / ms, 1);
+    const e = p < 0.5 ? 2*p*p : 1 - Math.pow(-2*p + 2, 2) / 2;
+    window.scrollTo(0, startY + dy * e);
+    if (p < 1) requestAnimationFrame(step);
+  })(t0);
+}
+
 /* fly to a venue */
 function goTo(n){
   const m = markers[n];
   if(!m) return;
-  document.getElementById('map-section').scrollIntoView({behavior:'smooth', block:'start'});
+  const sec = document.getElementById('map-section');
+  const top = sec.getBoundingClientRect().top + (window.pageYOffset || document.documentElement.scrollTop) - 10;
+  scrollToY(top, 400);
   Object.values(markers).forEach(x => x.el.classList.remove('active'));
   m.el.classList.add('active');
   setTimeout(() => {
