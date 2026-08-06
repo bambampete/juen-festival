@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>JÜN·FESTIVAL 2026 — Prague</title>
+<meta name="description" content="JÜN·FESTIVAL 2026 — Prague, 7–9 August. Timetable, venues, map.">
+<meta name="theme-color" content="#E63329">
+<meta property="og:title" content="JÜN·FESTIVAL 2026">
+<meta property="og:description" content="Prague, 7–9 August 2026. Timetable, venues, map.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23E63329'/%3E%3Cpath d='M50 18 L88 74 H12 Z' fill='%23fff'/%3E%3C/svg%3E">
+
+<link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+
+<style>
+@font-face{
+  font-family:'Marlboro';
+  src:url('./Marlboro.ttf') format('truetype');
+  font-weight:normal; font-style:normal; font-display:swap;
+}
+
+:root{
+  --red:#E63329;
+  --red-deep:#B3241C;
+  --black:#141210;
+  --cream:#F4EADA;
+  --cream-2:#EADCC4;
+  --gold:#C9A227;
+  --ink:#2A231D;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{
+  background:var(--red);
+  color:var(--black);
+  font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+.display{font-family:'Marlboro',Georgia,'Times New Roman',serif;font-weight:normal;letter-spacing:.01em}
+
+.wrap{max-width:760px;margin:0 auto;padding:0 16px 64px}
+
+/* ---------- HERO / PACK ---------- */
+.pack{
+  max-width:760px;margin:0 auto;padding:18px 16px 0;
+}
+.pack-inner{
+  background:var(--cream);
+  border:3px solid var(--black);
+  border-radius:4px;
+  overflow:hidden;
+  box-shadow:0 18px 40px rgba(0,0,0,.28);
+}
+.roof{display:block;width:100%;height:auto}
+.pack-body{padding:18px 20px 22px;text-align:center}
+.pack-body h1{
+  font-size:clamp(38px,11vw,74px);
+  line-height:.92;
+  text-transform:uppercase;
+  letter-spacing:.02em;
+}
+.pack-body .yr{
+  display:block;
+  font-size:clamp(26px,7vw,46px);
+  line-height:1;
+  margin-top:2px;
+  color:var(--red-deep);
+}
+.rule{height:3px;background:var(--black);margin:14px auto;width:70%}
+.pack-body .sub{
+  font-size:12px;letter-spacing:.28em;text-transform:uppercase;
+  font-weight:700;color:var(--ink);
+}
+.pack-body .sub2{
+  margin-top:6px;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#6b5c4c;
+}
+
+/* ---------- SECTION HEADS ---------- */
+.sec{margin-top:34px}
+.sec-head{
+  display:flex;align-items:baseline;gap:12px;margin-bottom:12px;
+}
+.sec-head h2{
+  font-family:'Marlboro',Georgia,serif;
+  font-size:clamp(22px,6vw,32px);
+  text-transform:uppercase;color:var(--cream);line-height:1;
+}
+.sec-head span{
+  flex:1;height:2px;background:rgba(244,234,218,.45);
+}
+
+/* ---------- MAP ---------- */
+.mapshell{
+  border:3px solid var(--black);border-radius:4px;overflow:hidden;
+  background:var(--cream);box-shadow:0 14px 30px rgba(0,0,0,.25);
+}
+#map{width:100%;height:min(66vh,540px);}
+.maptools{
+  display:flex;gap:0;border-top:3px solid var(--black);background:var(--cream);
+}
+.maptools button{
+  flex:1;padding:11px 4px;border:0;border-right:2px solid var(--black);
+  background:var(--cream);color:var(--ink);
+  font-family:'Marlboro',Georgia,serif;font-size:14px;letter-spacing:.14em;
+  text-transform:uppercase;cursor:pointer;
+}
+.maptools button:last-child{border-right:0}
+.maptools button.on{background:var(--red);color:var(--cream)}
+.maphint{
+  text-align:center;font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:rgba(244,234,218,.85);margin-top:8px;
+}
+
+/* markers */
+.pin{
+  width:34px;height:34px;border-radius:50%;
+  background:var(--cream);border:3px solid var(--black);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Marlboro',Georgia,serif;font-size:17px;color:var(--black);
+  cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,.45);
+  transition:transform .15s ease;
+}
+.pin:hover,.pin.active{transform:scale(1.18);background:var(--red);color:var(--cream)}
+
+/* popups */
+.maplibregl-popup-content{
+  background:var(--cream);border:3px solid var(--black);border-radius:3px;
+  padding:14px 16px 16px;box-shadow:0 10px 26px rgba(0,0,0,.4);max-width:270px;
+}
+.maplibregl-popup-tip{display:none}
+.maplibregl-popup-close-button{
+  font-size:20px;color:var(--black);padding:2px 8px;background:transparent;border:0;
+}
+.pop-n{
+  display:inline-block;background:var(--red);color:var(--cream);
+  font-family:'Marlboro',Georgia,serif;font-size:13px;
+  width:24px;height:24px;line-height:24px;text-align:center;border-radius:50%;
+  border:2px solid var(--black);margin-bottom:8px;
+}
+.pop-t{
+  font-family:'Marlboro',Georgia,serif;font-size:19px;line-height:1.05;
+  text-transform:uppercase;margin-bottom:5px;
+}
+.pop-a{font-size:12px;color:var(--ink);line-height:1.45;margin-bottom:7px}
+.pop-d{font-size:12px;color:#5b4d40;line-height:1.5;margin-bottom:11px}
+.pop-b{
+  display:block;text-align:center;background:var(--black);color:var(--cream);
+  text-decoration:none;padding:9px;font-size:11px;letter-spacing:.16em;
+  text-transform:uppercase;font-weight:700;border-radius:2px;
+}
+
+/* ---------- TIMETABLE ---------- */
+.days{display:grid;grid-template-columns:1fr;gap:14px}
+@media(min-width:620px){.days{grid-template-columns:1fr 1fr}}
+.day{
+  background:var(--cream);border:3px solid var(--black);border-radius:4px;overflow:hidden;
+}
+.day h3{
+  font-family:'Marlboro',Georgia,serif;font-size:26px;text-transform:uppercase;
+  text-align:center;padding:10px;border-bottom:3px solid var(--black);letter-spacing:.04em;
+}
+.row{
+  display:flex;align-items:flex-start;gap:10px;padding:11px 13px;
+  border-bottom:1px solid rgba(20,18,16,.18);text-align:left;width:100%;
+  background:transparent;border-left:0;border-right:0;border-top:0;
+  font-family:inherit;cursor:default;
+}
+.row:last-child{border-bottom:0}
+.row.link{cursor:pointer}
+.row.link:active{background:var(--cream-2)}
+.row .t{
+  font-family:'Marlboro',Georgia,serif;font-size:15px;min-width:74px;color:var(--red-deep);
+}
+.row .a{flex:1;font-size:13px;line-height:1.4;font-weight:600;color:var(--ink)}
+.row .n{
+  flex:none;width:23px;height:23px;line-height:19px;text-align:center;
+  border:2px solid var(--black);border-radius:50%;background:var(--red);color:var(--cream);
+  font-family:'Marlboro',Georgia,serif;font-size:12px;
+}
+.row .n.ghost{background:transparent;border-color:transparent}
+.sunday{
+  margin-top:14px;background:var(--cream);border:3px solid var(--black);border-radius:4px;
+  padding:12px 14px;text-align:center;font-size:13px;color:var(--ink);line-height:1.5;
+}
+.sunday b{font-family:'Marlboro',Georgia,serif;font-size:17px;text-transform:uppercase;display:block;margin-bottom:4px}
+
+/* ---------- VENUES ---------- */
+.venues{display:grid;gap:12px}
+.venue{
+  background:var(--cream);border:3px solid var(--black);border-radius:4px;
+  padding:14px 16px 16px;
+}
+.venue-top{display:flex;align-items:center;gap:11px;margin-bottom:8px}
+.venue-top .n{
+  flex:none;width:34px;height:34px;line-height:30px;text-align:center;
+  border:3px solid var(--black);border-radius:50%;background:var(--red);color:var(--cream);
+  font-family:'Marlboro',Georgia,serif;font-size:17px;
+}
+.venue-top h4{
+  font-family:'Marlboro',Georgia,serif;font-size:19px;line-height:1.05;text-transform:uppercase;
+}
+.venue-top .when{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--red-deep);font-weight:700;margin-top:3px}
+.venue .addr{font-size:12.5px;color:var(--ink);line-height:1.5;margin-bottom:6px;font-weight:600}
+.venue .desc{font-size:12.5px;color:#5b4d40;line-height:1.6;margin-bottom:12px}
+.venue .btns{display:flex;gap:8px}
+.venue .btns a,.venue .btns button{
+  flex:1;text-align:center;text-decoration:none;padding:10px 6px;border-radius:2px;
+  font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;
+  border:2px solid var(--black);cursor:pointer;font-family:inherit;
+}
+.venue .btns a{background:var(--black);color:var(--cream)}
+.venue .btns button{background:transparent;color:var(--black)}
+
+/* ---------- INFO ---------- */
+.info{
+  background:var(--cream);border:3px solid var(--black);border-radius:4px;overflow:hidden;
+}
+.info h3{
+  font-family:'Marlboro',Georgia,serif;font-size:22px;text-transform:uppercase;
+  text-align:center;padding:10px;border-bottom:3px solid var(--black);
+}
+.info .item{
+  display:flex;justify-content:space-between;gap:14px;align-items:center;
+  padding:12px 15px;border-bottom:1px solid rgba(20,18,16,.18);
+}
+.info .item:last-child{border-bottom:0}
+.info .k{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#7a6a58;font-weight:700}
+.info .v{font-size:13.5px;font-weight:700;text-align:right;color:var(--ink);line-height:1.4}
+.info .v a{color:var(--red-deep);text-decoration:none;border-bottom:1.5px solid var(--red-deep)}
+
+/* ---------- WARNING ---------- */
+.warn{
+  margin-top:26px;background:var(--cream);border:4px solid var(--black);
+  padding:14px 16px;text-align:center;
+}
+.warn b{
+  display:block;font-family:'Marlboro',Georgia,serif;font-size:16px;
+  text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;
+}
+.warn p{font-size:12px;line-height:1.6;color:var(--ink)}
+
+footer{
+  text-align:center;margin-top:28px;font-size:10px;letter-spacing:.22em;
+  text-transform:uppercase;color:rgba(244,234,218,.7);line-height:2;
+}
+</style>
+</head>
+<body>
+
+<!-- ============ HERO ============ -->
+<header class="pack">
+  <div class="pack-inner">
+    <svg class="roof" viewBox="0 0 400 96" preserveAspectRatio="none" aria-hidden="true">
+      <rect width="400" height="96" fill="#E63329"/>
+      <path d="M0 96 L200 8 L400 96 Z" fill="#F4EADA"/>
+    </svg>
+    <div class="pack-body">
+      <h1 class="display">Jün<br>Festival<span class="yr display">2026</span></h1>
+      <div class="rule"></div>
+      <p class="sub">Prague · 07—09 August</p>
+      <p class="sub2">18 Men · 1 Groom · 0 Regrets</p>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ============ MAP ============ -->
+  <section class="sec" id="map-section">
+    <div class="sec-head"><h2 class="display">The Map</h2><span></span></div>
+    <div class="mapshell">
+      <div id="map"></div>
+      <div class="maptools">
+        <button data-day="all" class="on">All</button>
+        <button data-day="fri">Friday</button>
+        <button data-day="sat">Saturday</button>
+      </div>
+    </div>
+    <p class="maphint">Tap a number for details · drag to rotate · two fingers to tilt</p>
+  </section>
+
+  <!-- ============ TIMETABLE ============ -->
+  <section class="sec">
+    <div class="sec-head"><h2 class="display">Timetable</h2><span></span></div>
+    <div class="days">
+      <div class="day">
+        <h3 class="display">Friday</h3>
+        <button class="row link" data-go="1"><span class="t display">3:00 PM</span><span class="a">Check-In Apartment</span><span class="n display">1</span></button>
+        <button class="row link" data-go="2"><span class="t display">4:30 PM</span><span class="a">Drinks @ Pivovar Národní</span><span class="n display">2</span></button>
+        <button class="row link" data-go="3"><span class="t display">8:00 PM</span><span class="a">Dinner @ Sugo</span><span class="n display">3</span></button>
+        <button class="row link" data-go="4"><span class="t display">10:30 PM</span><span class="a">Fun @ Darling Cabaret</span><span class="n display">4</span></button>
+        <button class="row link" data-go="5"><span class="t display">???</span><span class="a">Dying @ Club Epic</span><span class="n display">5</span></button>
+        <div class="row"><span class="t display">Later</span><span class="a">Be chill in the apartment</span><span class="n ghost"></span></div>
+      </div>
+      <div class="day">
+        <h3 class="display">Saturday</h3>
+        <button class="row link" data-go="1"><span class="t display">11:00 AM</span><span class="a">Shuttle departs</span><span class="n display">1</span></button>
+        <div class="row"><span class="t display">12:00 PM</span><span class="a">Secret Activity</span><span class="n ghost">?</span></div>
+        <button class="row link" data-go="1"><span class="t display">3:30 PM</span><span class="a">Fresh-Up</span><span class="n display">1</span></button>
+        <button class="row link" data-go="6"><span class="t display">5:00 PM</span><span class="a">Burgers @ Fat Cat</span><span class="n display">6</span></button>
+        <button class="row link" data-go="7"><span class="t display">7:30 PM</span><span class="a">Relax &amp; Drinks @ Baden Baden</span><span class="n display">7</span></button>
+        <button class="row link" data-go="8"><span class="t display">11:00 PM</span><span class="a">Pride Afterparty @ Fuchs2 / Bike Jesus</span><span class="n display">8</span></button>
+      </div>
+    </div>
+    <div class="sunday">
+      <b class="display">Sunday</b>
+      Check-out by 10:00 · hangover breakfast · drive home.
+    </div>
+  </section>
+
+  <!-- ============ VENUES ============ -->
+  <section class="sec">
+    <div class="sec-head"><h2 class="display">The Venues</h2><span></span></div>
+    <div class="venues" id="venues"></div>
+  </section>
+
+  <!-- ============ INFO ============ -->
+  <section class="sec">
+    <div class="sec-head"><h2 class="display">Need To Know</h2><span></span></div>
+    <div class="info">
+      <h3 class="display">Base &amp; Emergency</h3>
+      <div class="item"><span class="k">Apartment</span><span class="v">SOHO Suites Old Town<br>Karoliny Světlé 299/12<br>110 00 Praha 1 · Apt. C402</span></div>
+      <div class="item"><span class="k">Check-out</span><span class="v">Sunday, 10:00</span></div>
+      <div class="item"><span class="k">Pete (Best Man)</span><span class="v"><a href="tel:+436601211559">+43 660 1211559</a></span></div>
+      <div class="item"><span class="k">Emergency</span><span class="v"><a href="tel:112">112</a> · Europe-wide</span></div>
+      <div class="item"><span class="k">Taxi</span><span class="v">Bolt / Uber · both work in Prague</span></div>
+      <div class="item"><span class="k">Currency</span><span class="v">Czech koruna (CZK)<br>≈ 25 CZK = 1 €</span></div>
+    </div>
+
+    <div class="warn">
+      <b class="display">Warning</b>
+      <p>Drink water between rounds. Eat something. Keep your phone charged and stay with the group.<br>If anything goes wrong, call Pete first — then 112.</p>
+    </div>
+  </section>
+
+  <footer>
+    Jün · Festival 2026 · Prague<br>
+    Made for Jasko
+  </footer>
+</main>
+
+<script>
+/* ------------------------------------------------------------------
+   VENUE DATA — numbers match the printed timetable
+------------------------------------------------------------------ */
+const VENUES = [
+  {
+    n:1, day:['fri','sat'],
+    name:'The Apartment',
+    when:'Fri 15:00 · Sat 11:00 &amp; 15:30 · Sun 10:00',
+    address:'SOHO Suites Old Town, Karoliny Světlé 299/12, 110 00 Praha 1 — Apt. C402',
+    desc:'Base camp. Six bedrooms, three bathrooms, directly on the Vltava between Charles Bridge and the National Theatre. Check-in Friday 15:00, the Saturday shuttle leaves from the door at 11:00, fresh-up at 15:30, check-out Sunday by 10:00.',
+    lng:14.4148964, lat:50.0824820
+  },
+  {
+    n:2, day:['fri'],
+    name:'Pivovar Národní',
+    when:'Friday · 16:30',
+    address:'Národní 139/8, 110 00 Praha 1',
+    desc:'Microbrewery in a 17th-century Ursuline monastery next to the National Theatre. Own Czech Lion lager and a quiet beer garden in the middle of the city. Roughly a 6-minute walk from the apartment.',
+    lng:14.4153184, lat:50.0813089
+  },
+  {
+    n:3, day:['fri'],
+    name:'Sugo',
+    when:'Friday · 20:00',
+    address:'Sokolovská 715/107, 186 00 Praha 8 — Karlín',
+    desc:'Dinner. Italian, wood-fired, loud enough for eighteen people. The party bus to Darling picks us up here at around 22:15, so nobody wanders off.',
+    lng:14.4542090, lat:50.0947931
+  },
+  {
+    n:4, day:['fri'],
+    name:'Darling Cabaret',
+    when:'Friday · 22:30',
+    address:'Ve Smečkách 597/32, 110 00 Praha 1',
+    desc:'The largest cabaret in the Czech Republic, just off Wenceslas Square, open since 2000. Metro Muzeum and Můstek are both a few minutes away if you lose the group.',
+    lng:14.4277850, lat:50.0798568
+  },
+  {
+    n:5, day:['fri'],
+    name:'Club Epic',
+    when:'Friday · late',
+    address:'Revoluční 1003/3, 110 00 Praha 1',
+    desc:'2,500 m² across three underground floors, multi-genre with a focus on electronic. Last stop of the night — from here it is a 12-minute walk back to the apartment.',
+    lng:14.4275736, lat:50.0898192
+  },
+  {
+    n:6, day:['sat'],
+    name:'Fat Cat Burgers',
+    when:'Saturday · 17:00',
+    address:'Dlouhá 735/25, 110 00 Praha 1 — Old Town',
+    desc:'Burgers, ribs, wings and a long craft beer list, right in the Old Town. Refuelling stop before the island. Open daily 07:00—23:00.',
+    lng:14.4248189, lat:50.0903673
+  },
+  {
+    n:7, day:['sat'],
+    name:'Baden Baden Štvanice',
+    when:'Saturday · 19:30',
+    address:'Ostrov Štvanice, 170 00 Praha 7 — Holešovice',
+    desc:'Revived Vltava lido on the north bank of Štvanice island: wooden decks, deck chairs, DJ sets and drinks at the water. Saturdays until 23:30 — and two minutes from the afterparty.',
+    lng:14.445974283869, lat:50.096540169051
+  },
+  {
+    n:8, day:['sat'],
+    name:'Fuchs2 / Bike Jesus',
+    when:'Saturday · 23:00',
+    address:'Ostrov Štvanice 1125, 170 00 Praha 7 — Holešovice',
+    desc:'Prague Pride afterparty. A functionalist 1932 building by Josef Fuchs; Bike Jesus is the club downstairs, capacity 300. Same island as Baden Baden, a short walk west.',
+    lng:14.4363506, lat:50.0952223
+  }
+];
+
+const mapsLink = v => 'https://www.google.com/maps/search/?api=1&query=' + v.lat + '%2C' + v.lng;
+
+/* ------------------------------------------------------------------
+   VENUE LIST
+------------------------------------------------------------------ */
+const list = document.getElementById('venues');
+list.innerHTML = VENUES.map(v => `
+  <article class="venue" id="venue-${v.n}">
+    <div class="venue-top">
+      <div class="n display">${v.n}</div>
+      <div>
+        <h4 class="display">${v.name}</h4>
+        <div class="when">${v.when}</div>
+      </div>
+    </div>
+    <p class="addr">${v.address}</p>
+    <p class="desc">${v.desc}</p>
+    <div class="btns">
+      <a href="${mapsLink(v)}" target="_blank" rel="noopener">Google Maps</a>
+      <button data-go="${v.n}">Show on map</button>
+    </div>
+  </article>
+`).join('');
+
+/* ------------------------------------------------------------------
+   MAP
+------------------------------------------------------------------ */
+const PALETTE = {
+  land:'#F0E4CC', water:'#B3241C', green:'#DCCDA9', sand:'#EBDCBE',
+  roadMajor:'#FFFDF6', roadMinor:'#E3D4B4', building:'#E63329', ink:'#4A3B2E'
+};
+
+const map = new maplibregl.Map({
+  container:'map',
+  style:'https://tiles.openfreemap.org/styles/liberty',
+  center:[14.4318, 50.0885],
+  zoom:13.1,
+  pitch:58,
+  bearing:-18,
+  maxPitch:75,
+  attributionControl:{compact:true}
+});
+map.addControl(new maplibregl.NavigationControl({visualizePitch:true}),'top-right');
+map.addControl(new maplibregl.FullscreenControl(),'top-right');
+
+function paint(id, prop, value){ try{ map.setPaintProperty(id, prop, value); }catch(e){} }
+function hide(id){ try{ map.setLayoutProperty(id,'visibility','none'); }catch(e){} }
+
+map.on('load', () => {
+  map.getStyle().layers.forEach(l => {
+    const id = l.id;
+
+    if (l.type === 'background'){ paint(id,'background-color',PALETTE.land); return; }
+
+    // clutter out
+    if (/^poi|^airport|aeroway|label_other|highway-shield|road_one_way/.test(id)){ hide(id); return; }
+
+    if (id === 'building-3d'){
+      paint(id,'fill-extrusion-color',PALETTE.building);
+      paint(id,'fill-extrusion-opacity',0.92);
+      return;
+    }
+    if (id === 'building'){ paint(id,'fill-color','#DBC9A6'); return; }
+
+    if (/water|waterway/.test(id)){
+      if (l.type === 'fill') paint(id,'fill-color',PALETTE.water);
+      if (l.type === 'line') paint(id,'line-color',PALETTE.water);
+      if (l.type === 'symbol'){ paint(id,'text-color','#F0E4CC'); paint(id,'text-halo-color',PALETTE.water); }
+      return;
+    }
+
+    if (/park|landcover_wood|landcover_grass|cemetery|pitch|landuse_track/.test(id)){
+      if (l.type === 'fill') paint(id,'fill-color',PALETTE.green);
+      if (l.type === 'line') paint(id,'line-color',PALETTE.green);
+      return;
+    }
+
+    if (/landuse|landcover|aeroway_fill/.test(id)){
+      if (l.type === 'fill') paint(id,'fill-color',PALETTE.sand);
+      return;
+    }
+
+    if (l.type === 'line'){
+      const major = /motorway|trunk|primary|secondary|tertiary/.test(id);
+      const casing = /casing/.test(id);
+      paint(id,'line-color', casing ? '#CDBB96' : (major ? PALETTE.roadMajor : PALETTE.roadMinor));
+      return;
+    }
+
+    if (l.type === 'symbol'){
+      paint(id,'text-color',PALETTE.ink);
+      paint(id,'text-halo-color','rgba(240,228,204,.9)');
+      paint(id,'text-halo-width',1.4);
+    }
+  });
+});
+
+/* markers */
+const markers = {};
+VENUES.forEach(v => {
+  const el = document.createElement('div');
+  el.className = 'pin display';
+  el.textContent = v.n;
+  el.setAttribute('aria-label', v.n + ' — ' + v.name);
+
+  const popup = new maplibregl.Popup({offset:24, closeButton:true, maxWidth:'280px'})
+    .setHTML(`
+      <div class="pop-n display">${v.n}</div>
+      <div class="pop-t display">${v.name}</div>
+      <div class="pop-a">${v.address}</div>
+      <div class="pop-d">${v.desc}</div>
+      <a class="pop-b" href="${mapsLink(v)}" target="_blank" rel="noopener">Open in Google Maps</a>
+    `);
+
+  const m = new maplibregl.Marker({element:el, anchor:'center'})
+    .setLngLat([v.lng, v.lat])
+    .setPopup(popup)
+    .addTo(map);
+
+  markers[v.n] = {marker:m, el, popup, data:v};
+});
+
+/* fly to a venue */
+function goTo(n){
+  const m = markers[n];
+  if(!m) return;
+  document.getElementById('map-section').scrollIntoView({behavior:'smooth', block:'start'});
+  Object.values(markers).forEach(x => x.el.classList.remove('active'));
+  m.el.classList.add('active');
+  setTimeout(() => {
+    map.flyTo({center:[m.data.lng, m.data.lat], zoom:16.4, pitch:62, bearing:-18, speed:0.9, essential:true});
+    m.marker.togglePopup();
+  }, 420);
+}
+document.addEventListener('click', e => {
+  const btn = e.target.closest('[data-go]');
+  if (btn) goTo(Number(btn.dataset.go));
+});
+
+/* day filter */
+document.querySelectorAll('.maptools button').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('.maptools button').forEach(x => x.classList.remove('on'));
+    b.classList.add('on');
+    const d = b.dataset.day;
+    Object.values(markers).forEach(m => {
+      const show = d === 'all' || m.data.day.includes(d);
+      m.el.style.display = show ? 'flex' : 'none';
+    });
+    const bounds = new maplibregl.LngLatBounds();
+    VENUES.filter(v => d === 'all' || v.day.includes(d)).forEach(v => bounds.extend([v.lng, v.lat]));
+    map.fitBounds(bounds, {padding:{top:70,bottom:70,left:60,right:60}, pitch:58, bearing:-18, duration:900});
+  });
+});
+</script>
+</body>
+</html>
