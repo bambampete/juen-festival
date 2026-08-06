@@ -449,11 +449,11 @@ const PALETTE = {
 const map = new maplibregl.Map({
   container:'map',
   style:'https://tiles.openfreemap.org/styles/liberty',
-  center:[14.4318, 50.0885],
-  zoom:13.1,
-  pitch:58,
+  center:[14.4275736, 50.0898192],
+  zoom:16.4,
+  pitch:66,
   bearing:-18,
-  maxPitch:75,
+  maxPitch:80,
   attributionControl:{compact:true}
 });
 map.addControl(new maplibregl.NavigationControl({visualizePitch:true}),'top-right');
@@ -472,8 +472,12 @@ map.on('load', () => {
     if (/^poi|^airport|aeroway|label_other|highway-shield|road_one_way/.test(id)){ hide(id); return; }
 
     if (id === 'building-3d'){
-      paint(id,'fill-extrusion-color',PALETTE.building);
-      paint(id,'fill-extrusion-opacity',0.92);
+      paint(id,'fill-extrusion-color',[
+        'interpolate',['linear'],['get','render_height'],
+        0,'#F0736A', 12,'#E63329', 30,'#B3241C', 80,'#7E140F'
+      ]);
+      paint(id,'fill-extrusion-opacity',0.95);
+      try{ map.setLayerZoomRange('building-3d', 13, 24); }catch(e){}
       return;
     }
     if (id === 'building'){ paint(id,'fill-color','#DBC9A6'); return; }
@@ -509,6 +513,27 @@ map.on('load', () => {
       paint(id,'text-halo-width',1.4);
     }
   });
+
+  /* intro: start close in 3D over the Old Town, then pull back to show all 8 stops */
+  let touched = false;
+  const stop = () => { touched = true; };
+  map.once('dragstart', stop);
+  map.once('wheel', stop);
+  map.once('touchstart', stop);
+
+  setTimeout(() => {
+    if (touched) return;
+    const b = new maplibregl.LngLatBounds();
+    VENUES.forEach(v => b.extend([v.lng, v.lat]));
+    const cam = map.cameraForBounds(b, {padding:{top:70,bottom:70,left:55,right:55}});
+    if (!cam) return;
+    map.flyTo({
+      center:cam.center,
+      zoom:cam.zoom,
+      pitch:54, bearing:-18,
+      duration:3600, curve:1.5, essential:true
+    });
+  }, 1400);
 });
 
 /* markers */
@@ -544,7 +569,7 @@ function goTo(n){
   Object.values(markers).forEach(x => x.el.classList.remove('active'));
   m.el.classList.add('active');
   setTimeout(() => {
-    map.flyTo({center:[m.data.lng, m.data.lat], zoom:16.4, pitch:62, bearing:-18, speed:0.9, essential:true});
+    map.flyTo({center:[m.data.lng, m.data.lat], zoom:17, pitch:66, bearing:-18, speed:0.9, essential:true});
     m.marker.togglePopup();
   }, 420);
 }
